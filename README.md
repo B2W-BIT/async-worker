@@ -61,42 +61,10 @@ async def log_callback(name: str,
 async def drain_handler(message):
     async with Timeit(name="xablau-access-time", callback=log_callback):
         await access_some_remote_content()
-
 ```
 
 Caso uma exceção seja levantada dentro do contexto, `log_callback` será chamado
 com os dados da exceção.
-
-Também é possível repassar keyword arguments para o callback:
-
-```python
-import traceback
-from typing import Type
-
-from asyncworker.utils import Timeit
-
-
-# App initialization stuff...
-
-async def log_callback(name: str,
-                       time_delta: float, 
-                       exc_type: Type[Exception]=None, 
-                       exc_val: Exception=None, 
-                       exc_tb: traceback=None,
-                       dog: str=None):
-    log = {'name': name, 'time_delta': time_delta, 'dog': dog}
-    if exc_type:
-        await logger.error(log, exc_info=(exc_type, exc_val, exc_tb))
-    else:
-        await logger.info(log)
-
-
-@app.route(["xablau-queue"], vhost="/")
-async def drain_handler(message):
-    async with Timeit(name="xablau-access-time", callback=log_callback, dog='Xablau'):
-        await access_some_remote_content()
-
-```
 
 ## Atualizando o async-worker no seu projeto
 
