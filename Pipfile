@@ -17,6 +17,8 @@ ipython = "==6.4.0"
 pytest = "==3.6.1"
 pytest-coverage = "*"
 codecov = "==1.0.0"
+freezegun = "==0.3.10"
 
 [requires]
 python_version = "3.6"
+
