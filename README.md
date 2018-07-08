@@ -29,6 +29,43 @@ Se o handler lançar alguma exception, a mensagem é automaticamente devolvida p
 Se o handler rodar sem erros, a mensagem é automaticamente confirmada (ack).
 
 
+## Utils
+### Timeit
+
+Um gerenciador de contexto para marcar o tempo de execução de código e chamar
+um callback `(str, float, Optional[Type[Exception]], Optional[Exception], Optional[traceback]) -> Coroutine` 
+assíncrono ao final, com o tempo total de execução.
+
+```python
+import traceback
+from typing import Type
+
+from asyncworker.utils import Timeit
+
+
+# App initialization stuff...
+
+async def log_callback(name: str,
+                       time_delta: float, 
+                       exc_type: Type[Exception]=None, 
+                       exc_val: Exception=None, 
+                       exc_tb: traceback=None):
+    log = {'name': name, 'time_delta': time_delta}
+    if exc_type:
+        await logger.error(log, exc_info=(exc_type, exc_val, exc_tb))
+    else:
+        await logger.info(log)
+
+
+@app.route(["xablau-queue"], vhost="/")
+async def drain_handler(message):
+    async with Timeit(name="xablau-access-time", callback=log_callback):
+        await access_some_remote_content()
+```
+
+Caso uma exceção seja levantada dentro do contexto, `log_callback` será chamado
+com os dados da exceção.
+
 ## Atualizando o async-worker no seu projeto
 
 ### 0.1.0 para 0.2.0
