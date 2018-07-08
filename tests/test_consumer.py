@@ -196,7 +196,7 @@ class ConsumerTest(asynctest.TestCase):
             await consumer.on_queue_message({"key": "value"}, delivery_tag=10, queue=queue_mock)
             await consumer.on_queue_message({"key": "value"}, delivery_tag=11, queue=queue_mock)
 
-        self.assertEqual([mock.call(delivery_tag=10, requeue=True), mock.call(delivery_tag=11, requeue=True)], queue_mock.reject.await_args_list)
+        self.assertCountEqual([mock.call(delivery_tag=10, requeue=True), mock.call(delivery_tag=11, requeue=True)], queue_mock.reject.await_args_list)
         queue_mock.ack.assert_not_awaited
 
     async def test_on_queue_message_precondition_failed_on_ack(self):
@@ -248,7 +248,7 @@ class ConsumerTest(asynctest.TestCase):
         await consumer.on_queue_message({"key": "value"}, delivery_tag=20, queue=queue_mock)
         handler_mock.assert_awaited_once_with(consumer.bucket._items)
 
-        self.assertEqual([mock.call(delivery_tag=10), mock.call(delivery_tag=20)], queue_mock.ack.await_args_list)
+        self.assertCountEqual([mock.call(delivery_tag=10), mock.call(delivery_tag=20)], queue_mock.ack.await_args_list)
         self.assertEqual(0, queue_mock.reject.call_count)
 
     async def test_on_queue_message_bulk_mixed_ack_and_reject(self):
