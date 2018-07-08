@@ -89,14 +89,16 @@ class Consumer(AsyncQueueConsumerDelegate):
             if self.bucket.is_full():
                 all_messages = self.bucket.pop_all()
                 rv = await self._handler(all_messages)
-                for m in all_messages:
-                    await m.process_success(queue)
+                await asyncio.gather(
+                    *(m.process_success(queue) for m in all_messages)
+                )
             return rv
         except AioamqpException as aioamqpException:
             raise aioamqpException
         except Exception as e:
-            for m in all_messages:
-                await m.process_exception(queue)
+            await asyncio.gather(
+                *(m.process_exception(queue) for m in all_messages)
+            )
             raise e
 
     async def on_queue_error(self, body, delivery_tag, error, queue):
