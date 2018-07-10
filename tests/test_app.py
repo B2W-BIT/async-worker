@@ -3,7 +3,7 @@ import asyncio
 import asynctest
 
 from asyncworker import App
-from asyncworker.options import Options, Defaultvalues
+from asyncworker.options import Options, Defaultvalues, Events, Actions
 
 class AppTest(asynctest.TestCase):
 
@@ -25,7 +25,9 @@ class AppTest(asynctest.TestCase):
             "options": {
                 "vhost": expected_vhost,
                 "bulk_size": 1024,
-                "bulk_flush_interval": 120
+                "bulk_flush_interval": 120,
+                Events.ON_SUCCESS: Actions.ACK,
+                Events.ON_EXCEPTION: Actions.REQUEUE,
             }
         }
         self.assertEqual(expected_registry_entry, app.routes_registry[_handler])
@@ -104,6 +106,33 @@ class AppTest(asynctest.TestCase):
         self.assertEqual(Defaultvalues.BULK_FLUSH_INTERVAL, app.routes_registry[_handler]['options']['bulk_flush_interval'])
         self.assertEqual(42, await app.routes_registry[_handler]['handler'](None))
 
+    async def test_register_action_on_success(self):
+        app = App(**self.connection_parameters)
+        @app.route(["my-queue"], options = {Events.ON_SUCCESS: Actions.REJECT})
+        async def _handler(message):
+            return 42
+
+        self.assertIsNotNone(app.routes_registry)
+        self.assertEqual(Actions.REJECT, app.routes_registry[_handler]['options'][Events.ON_SUCCESS])
+
+    async def test_register_action_on_exception(self):
+        app = App(**self.connection_parameters)
+        @app.route(["my-queue"], options = {Events.ON_EXCEPTION: Actions.ACK})
+        async def _handler(message):
+            return 42
+
+        self.assertIsNotNone(app.routes_registry)
+        self.assertEqual(Actions.ACK, app.routes_registry[_handler]['options'][Events.ON_EXCEPTION])
+
+    async def test_test_register_default_actions(self):
+        app = App(**self.connection_parameters)
+        @app.route(["my-queue"])
+        async def _handler(message):
+            return 42
+
+        self.assertIsNotNone(app.routes_registry)
+        self.assertEqual(Actions.ACK, app.routes_registry[_handler]['options'][Events.ON_SUCCESS])
+        self.assertEqual(Actions.REQUEUE, app.routes_registry[_handler]['options'][Events.ON_EXCEPTION])
 
     async def test_app_receives_queue_connection(self):
         app = App(host="127.0.0.1", user="guest", password="guest", prefetch_count=1024)

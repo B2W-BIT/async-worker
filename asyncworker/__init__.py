@@ -4,7 +4,7 @@ import asyncio
 from .consumer import Consumer
 
 from asyncworker import conf
-from asyncworker.options import Options, Defaultvalues
+from asyncworker.options import Options, Defaultvalues, Events
 from .bucket import Bucket
 
 def entrypoint(f):
@@ -32,6 +32,8 @@ class App:
                     "vhost": vhost,
                     "bulk_size": options.get(Options.BULK_SIZE, Defaultvalues.BULK_SIZE),
                     "bulk_flush_interval": options.get(Options.BULK_FLUSH_INTERVAL, Defaultvalues.BULK_FLUSH_INTERVAL),
+                    Events.ON_SUCCESS: options.get(Events.ON_SUCCESS, Defaultvalues.ON_SUCCESS),
+                    Events.ON_EXCEPTION: options.get(Events.ON_EXCEPTION, Defaultvalues.ON_EXCEPTION),
                 }
             }
             return f

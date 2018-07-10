@@ -1,5 +1,4 @@
 import asyncio
-import sys
 import traceback
 from typing import Type
 
@@ -7,12 +6,19 @@ from easyqueue.async import AsyncQueueConsumerDelegate, AsyncQueue
 from aioamqp.exceptions import AioamqpException
 
 from asyncworker import conf
+from asyncworker.options import Events
 from .bucket import Bucket
 from .rabbitmq import RabbitMQMessage
 
-class Consumer(AsyncQueueConsumerDelegate):
 
-    def __init__(self, route_info, host, username, password, prefetch_count=128, bucket_class: Type[Bucket]=Bucket):
+class Consumer(AsyncQueueConsumerDelegate):
+    def __init__(self,
+                 route_info,
+                 host,
+                 username,
+                 password,
+                 prefetch_count=128,
+                 bucket_class: Type[Bucket]=Bucket):
         self.route = route_info
         self._handler = route_info['handler']
         self._queue_name = route_info['route']
@@ -21,7 +27,8 @@ class Consumer(AsyncQueueConsumerDelegate):
         self.vhost = self._route_options.get("vhost", "/")
         if self.vhost != "/":
             self.vhost = self.vhost.lstrip("/")
-        self.bucket = bucket_class(size=min(self._route_options['bulk_size'], prefetch_count))
+        self.bucket = bucket_class(size=min(self._route_options['bulk_size'],
+                                            prefetch_count))
         self.queue = AsyncQueue(host,
                                 username,
                                 password,
@@ -33,7 +40,9 @@ class Consumer(AsyncQueueConsumerDelegate):
     def queue_name(self) -> str:
         return self._queue_name
 
-    async def on_before_start_consumption(self, queue_name: str, queue: 'AsyncQueue'):
+    async def on_before_start_consumption(self,
+                                          queue_name: str,
+                                          queue: 'AsyncQueue'):
         """
         Coroutine called before queue consumption starts. May be overwritten to
         implement further custom initialization.
@@ -45,12 +54,13 @@ class Consumer(AsyncQueueConsumerDelegate):
         """
         pass
 
-    async def on_consumption_start(self, consumer_tag: str, queue: 'AsyncQueue'):
+    async def on_consumption_start(self,
+                                   consumer_tag: str,
+                                   queue: 'AsyncQueue'):
         """
         Coroutine called once consumption started.
         """
         pass
-
 
     async def on_queue_message(self, content, delivery_tag, queue):
         """
@@ -68,22 +78,28 @@ class Consumer(AsyncQueueConsumerDelegate):
         try:
 
             if not self.bucket.is_full():
-                self.bucket.put(RabbitMQMessage(body=content, delivery_tag=delivery_tag))
+                message = RabbitMQMessage(
+                    body=content,
+                    delivery_tag=delivery_tag,
+                    on_success=self._route_options[Events.ON_SUCCESS],
+                    on_exception=self._route_options[Events.ON_EXCEPTION],
+                )
+                self.bucket.put(message)
 
             if self.bucket.is_full():
                 all_messages = self.bucket.pop_all()
                 rv = await self._handler(all_messages)
-                for m in all_messages:
-                    await m.process(queue)
+                await asyncio.gather(
+                    *(m.process_success(queue) for m in all_messages)
+                )
             return rv
         except AioamqpException as aioamqpException:
             raise aioamqpException
         except Exception as e:
-            for m in all_messages:
-                m.reject()
-                await m.process(queue)
+            await asyncio.gather(
+                *(m.process_exception(queue) for m in all_messages)
+            )
             raise e
-
 
     async def on_queue_error(self, body, delivery_tag, error, queue):
         """
@@ -98,7 +114,11 @@ class Consumer(AsyncQueueConsumerDelegate):
         :type error: MessageError
         :type queue: AsyncQueue
         """
-        conf.logger.error({"parse-error": True, "exception": "Error: not a JSON", "original_msg": body})
+        conf.logger.error({
+            "parse-error": True,
+            "exception": "Error: not a JSON",
+            "original_msg": body
+        })
         try:
             await queue.ack(delivery_tag=delivery_tag)
         except AioamqpException as e:
@@ -129,7 +149,6 @@ class Consumer(AsyncQueueConsumerDelegate):
         }
         conf.logger.error(current_exception)
 
-
     async def consume_all_queues(self, queue):
         for queue_name in self._queue_name:
             # Por enquanto não estamos guardando a consumer_tag retornada
@@ -147,6 +166,9 @@ class Consumer(AsyncQueueConsumerDelegate):
                     await self.queue.connect()
                     await self.consume_all_queues(self.queue)
                 except Exception as e:
-                    conf.logger.error({"type": "connection-failed", "dest": self.host, "retry": True, "exc_traceback": traceback.format_exc()})
+                    conf.logger.error({
+                        "type": "connection-failed",
+                        "dest": self.host, "retry": True,
+                        "exc_traceback": traceback.format_exc()
+                    })
             await asyncio.sleep(1)
-
