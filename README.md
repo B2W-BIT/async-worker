@@ -21,6 +21,9 @@ app = App(host="127.0.0.1", user="guest", password="guest", prefetch_count=256)
 async def drain_handler(message):
     logger.info(message)
 
+
+app.run()
+
 ```
 
 Nesse exemplo, o handler `drain_handler()` recebe mensagens de ambas as filas: `asgard/counts` e `asgard/counts/errors`.
@@ -167,6 +170,9 @@ app = App(host="127.0.0.1", user="guest", password="guest", prefetch_count=256)
 async def drain_handler(message):
     logger.info(message)
 
+
+app.run()
+
 ```
 
 passa a ser assim:
@@ -180,5 +186,8 @@ app = App(host="127.0.0.1", user="guest", password="guest", prefetch_count=256)
 async def drain_handler(messages):
     for m in messages:
       logger.info(message.body)
+
+
+app.run()
 
 ```
