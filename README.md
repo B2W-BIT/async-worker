@@ -2,20 +2,19 @@
 [![Build Status](https://travis-ci.org/B2W-BIT/async-worker.svg?branch=master)](https://travis-ci.org/B2W-BIT/async-worker)
 [![codecov](https://codecov.io/gh/B2W-BIT/async-worker/branch/master/graph/badge.svg)](https://codecov.io/gh/B2W-BIT/async-worker)
 
-# Async Worker
-
-## Propósito
-
-Ser um microframework (inspirado no flask) para facilitar a escrita de workers assíncronos.
-Atualmente o projeto suporta as seguintes backends:
-
-* [RabbitMQ](https://www.rabbitmq.com/): Somente leitura de mensagens. A implementação de publicação de mensagens será feita no #9;
-* [Server Side Events](https://en.wikipedia.org/wiki/Server-sent_events): Possibilidade de eventos de um endpoint que emite implementa Server Side Events.
-
-
-## Exemplos
-
-### Worker lendo dados de um RabbitMQ
+# Async Worker  
+  
+## Purpose  
+  
+To be a microframework (inspired in flask) to facilitate the code of asynchronous workers.   
+Nowadays, the project supports the following backends:  
+  
+* [RabbitMQ](https://www.rabbitmq.com/): Only to read messages. The implementation of publish messages will be done in #9;  
+* [Server Side Events](https://en.wikipedia.org/wiki/Server-sent_events): Possibilities of endpoint events that implements Server Side Events.  
+  
+## Examples  
+  
+### Worker reading data from RabbitMQ  
 
 ```python
 
@@ -29,13 +28,15 @@ async def drain_handler(message):
 
 ```
 
-Nesse exemplo, o handler `drain_handler()` recebe mensagens de ambas as filas: `asgard/counts` e `asgard/counts/errors`.
-
-Se o handler lançar alguma exception, a mensagem é automaticamente devolvida para a fila (reject com requeue=True);
-Se o handler rodar sem erros, a mensagem é automaticamente confirmada (ack).
-
-### Worker lendo dados de um endpoint Server Side Events
-
+In this example, the handler `drain_handler()` receives messages from both queues:   
+`asgard/counts` and `asgard/counts/errors`  
+  
+If the handler throws an exception, the message is automatically putted back into the same queue (reject with requeue = True);  
+  
+If the handler run without erros, the message is automatically confirmed (ack).  
+  
+### Worker reading data from a Server Side Events endpoint  
+  
 ```python
 
 from asyncworker.sse.app import SSEApplication
@@ -59,40 +60,36 @@ async def _on_event(events):
 
         print(f"Event Received: {event.name} {data}")
 ```
-
-Nesse exemplo, o handler `_on_event()` recebe os eventos enviados pelo servidor. O objeto `events` é sempre uma lista, mesmo quando estamos usando `BULK_SIZE=1` (Falaremos sobre isso mais a frente)
-
-### Rodando esses código
-
-Ambos os exemplos precisam de um `main()` para poderem rodar. Um exemplo de `main` seria o seguinte, assumindo que o objeto `app` está no módulo `myworker`:
-
-```python
-
-from myworker import app
-
-app.run()
-
-```
-
-Nesse ponto sua app já estará rodando e caso você seja desconectado, um loop ficará tentanto reconectar. A cada erro de conexão um log de exception é gerado.
-
-A seguir temos documentações específicas sobre cada backend implementado
-
-
-# RabbitMQ
-
-## Rejeitando uma mensagem e não colocando-a de volta na fila
-
-Opcionalmente, caso seja necessário rejeitar uma mensagem e ao mesmo tempo **não** devolver essa mensagem pra fila,
-podemos chamar `message.reject(requeue=False)`. O valor default do `requeue` é `True`.
-
-## Configurações de ação padrão em caso de sucesso e exception
-
-É possível escolher o que o asynworker fará com as mensagens em caso de sucesso (handler executa sem lançar exceção)
-ou em caso de falha (handler lança uma exception não tratada).
-
-As opções são: Events.ON_SUCCESS e Events.ON_EXCEPTION. Ambas são passadas a cada rota de consumo registrada, ex:
-
+  
+In this example, the handler  `_on_event()` receives the events sent from server. The object `events` is always a list, even if we are using `BULK_SIZE=1` (We will talk about that further).  
+  
+### Running these codes  
+  
+Both examples need a `main()` to be able to run. Some example of `main` will be the following, assuming that the `app` object is inside `myworker` module:  
+  
+```python  
+  
+from myworker import app  
+  
+app.run()  
+  
+```  
+At this point your app will be running. In case of being disconnected, a loop will be trying to reconnect. For every connection error, an exception log is generated.  
+  
+Next, we have specific documentations about every backend implemented.  
+  
+  
+# RabbitMQ  
+  
+## Rejecting a message and not putting back in queue   
+Optionally,  in case of being necessary to reject a message and in the same time **not** putting back in queue, we could call `message.reject(requeue=False)`. The default value of `requeue` is `True`.  
+  
+##  Default action configurations in case of success and exception  
+  
+It is possibible to chose what asyncwork will do with the messages in case of success (handler executes without throw an exception) or in case of failure (handler throws an untreated exception).   
+  
+The options are: `Events.ON_SUCCESS` and `Events.ON_EXCEPTION`. Both are passed in each registered consume route, example:  
+  
 ```python
 from asynworker.options import Events, Actions
 
@@ -103,39 +100,36 @@ from asynworker.options import Events, Actions
 async def handler(messages):
     ...
 ```
+  
+In this case, if the handler runs with success, all the messages will respond with `ACK`.  On the other hand, if an untreated exception was caught by asyncworker, it will respond with `REJECT`.   
+  
+### Possible options  
+  
+ - `Actions.ACK`: Confirms the message to RabbitMQ   
+ - `Actions.REJECT`: Rejects the message and **does not put back** into the origin queue  
+ - `Actions.REQUEUE`: Rejects the message and **puts back** into the origin queue  
+   
+### Overwriting the default action only for some messages   
+It is possible to chose an action different from default to every message in the bulk that was delivered to the handler. For this, it's necessary to call one of the methods from the `RabbitMQMessage` object. They are:  
+  
+ - `.accept()`: Marks the message to be confirmed to the RabbitMQ   
+ - `.reject(requeue=False)`: Marks the message to be reject and **does not put back** into the origin queue  
+ - `.reject(requeue=True)`: Marks the message to be reject and **puts back** into the origin queue   
+  
+The default value to  `.reject()` is `requeue=True`.  
+  
+  
+# Server Side Events   
+  
+# Receiving batch data   
 
-Nesse caso, se o handler rodar com sucesso, todas as mensagem soferão `ACK`. Caso uma exceção não tratada seja capturada
-pelo asyncworker todas as mensagens sofrerão `REJECT`.
-
-### Opções possíveis
-
- - `Actions.ACK`: Confirma a mensagem para o RabbitMQ
- - `Actions.REJECT`: Rejeita a mensagem e **não devolve para a fila de origem**
- - `Actions.REQUEUE`: Rejeita a mensagem e **devolve** para a fila de origem.
-
-### Sobrescrevendo a ação padrão apenas para algumas mensagens
-
-É possível escolher uma ação diferente da padrão para qualquer mensagem do bulk que foi entregue ao handler. Para isso
-basta chamar um dos métodos do objeto `RabbitMQMessage`. São eles:
-
- - `.accept()`: Marca a mensagem para ser confirmada para o RabbitMQ
- - `.reject(requeue=False)`: Marca a mensagem para ser rejeitada e **não devolvida** para a fila de origem
- - `.reject(requeue=True)`: Marca a mensagem para ser rejeitada e **devolvida** para a fila de origem
-
-O valor default para o `.reject()` é `requeue=True`.
-
-# Server Side Events 
-
-
-# Recebendo dados em lote
-
-o async-worker permite que você receba seus dados em lotes de tamanho definido por você. A forma de escolher esse lote é atrávez da opção `Options.BULK_SIZE`.
-Essa opção é passada para cada um dos handlers, individualmente. O default é `BULK_SIZE=1`.
-
-## Escolhendo o tamanho do BULK que será usado
-
-Assumindo que nossa `app` já está criada. Independente de qual tipo de app é, o decorator `@app.route()` recebe um kwarg chamado `options` onde podemos passar o BULK_SIZE, assim:
-
+The async-worker allows that you receive your batch data in sizes defined by you. You can define and chose this batch through the option `Options.BULK_SIZE`.  
+This option is passed individually to each of handlers. The default is `BULK_SIZE=1`.  
+  
+## Choosing the BULK size that will be used  
+  
+Assuming that our `app` is already created, independent of what type the app is, the decorator `@app.route()` receives a *kward* called `options` where we can pass the BULK_SIZE as you can see in the example below:  
+  
 ```python
 from asyncworker.options import Options
 
@@ -144,20 +138,19 @@ async def _handler(dat):
     for m in messages:
       logger.info(message.body)
 
-```
-
-Nesse exemplo, o `_handler` só será chamado quando o async-worker tiver, **já nas mãos**, 1000 itens. Os 1000 itens serão passados de uma única vez para o handler, em uma lista.
-
-### BULK_SIZE e o backend RabbitMQ
-
-O valor do BULK_SIZE sempre é escolhido com a fórmula: `min(BULK_SIZE, PREFRETCH)`. Isso para evitar que o código fique em um deadlock, onde ao mesmo tempo que ele aguarda o bulk encher para poder pegar mais mensagens da fila, ele está aguardando o bulk esvaziar para pegar mais mensagens da fila.
- 
-## Atualizando o async-worker no seu projeto
-
-### 0.1.x > 0.2.0
-
-Na versão `0.2.0` criamos a possibilidade de receber mensagens em lote. E a partir dessa versão
-a assinatura do handler mudo para:
+```  
+In this example, the  `_handler` only will be called when the *async-worker* had, **in its hands**, 1000 items. The 10000 items will be passed once to the handler in a list.  
+  
+### BULK_SIZE and the backend RabbitMQ  
+  
+The value of BULK_SIZE is always chosen with the formula: `min(BULK_SIZE, PREFRETCH)`. This is necessary to avoid that the code stays in a deadlock, where in the same time that it waits the bulk flood, it is waiting the bulk stays empty to get more messages in the queue.  
+   
+## Updating the async-worker in your project  
+  
+### 0.1.x > 0.2.0  
+  
+In version `0.2.0`, we create the possibility to receive bulk messages. For this version and later,  the handler signature has changed to:  
+  
 
 ```python
 from asyncworker.rabbitmq.message import Message
@@ -165,12 +158,11 @@ from asyncworker.rabbitmq.message import Message
 async def handler(messages: List[Message]):
   pass
 ```
-
-As instâncias do objeto `asyncworker.rabbitmq.RabbitMQMessage` já vêm por padrão configurado para receber `ack()` 
-depois queo handler retornar (sem exception), mas o handler pode mudar isso
-chamando o método `message.reject()` para cada mensagem que precisar ser devolvida para a fila.
-
-O conteúdo da mensagem original está agora no atributo `message.body`. Então um handler antigo que era assim:
+  
+The instances of `asyncworker.rabbitmq.RabbitMQMessage` object are already configured by default to receive `ack()` after the handler returns (without exception). However, the handler can change it calling `message.reject()` method to each message that needs to be putted back in queue.  
+  
+The original content from message is now in `message.body` attribute. So, an old handler that was written in this way:  
+  
 
 ```python
 from asyncworker import App
@@ -182,9 +174,9 @@ async def drain_handler(message):
     logger.info(message)
 
 ```
-
-passa a ser assim:
-
+  
+transforms into:  
+  
 ```python
 from asyncworker import App
 
@@ -196,16 +188,15 @@ async def drain_handler(messages):
       logger.info(message.body)
 
 ```
-
-## Utils
-### Timeit (0.3.0+)
-
-#### Gerenciador de contexto
-
-Um gerenciador de contexto para marcar o tempo de execução de código e chamar
-um callback `Callable[..., Coroutine]` 
-assíncrono ao final, com o tempo total de execução.
-
+  
+# Utils  
+  
+## Timeit (0.3.0+)  
+  
+### Context Manager  
+  
+A context manager to measure execution time of the code and call an asynchronous callback `Callable[..., Coroutine]` in the end with the total execution time.  
+  
 ```python
 import asyncio
 from asyncworker.utils import Timeit
@@ -224,9 +215,7 @@ loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
 ```
 
-Caso uma exceção seja levantada dentro do contexto, `log_callback` será chamado
-com os dados da exceção explicitamente.
-
+If an exception is raised inside the context, `log_callback` will be called with the exception data explicitly.  
 
 ```python
 import asyncio
@@ -245,11 +234,11 @@ async def main():
 loop = asyncio.get_event_loop()
 loop.run_until_complete(main())
 ```
-
-#### Decorator
-
-Também é possível utilizar `Timeit` como um decorator:
-
+  
+### Decorator  
+  
+It is also possible to use `Timeit` as a decorator:  
+  
 ```python
 # ...
 
@@ -258,13 +247,11 @@ Também é possível utilizar `Timeit` como um decorator:
 async def drain_handler(message):
     await access_some_remote_content()
 ```
-
-#### Múltiplas transações (0.4.0+)
-
-Muitas vezes queremos ter várias métricas ao mesmo tempo para contar o tempo
-dentro de um mesmo contexto de execução. Para isso, uma mesma instância pode
-receber múltiplas chamadas.
-
+  
+### Multiple transactions (0.4.0+)  
+  
+Frequently we want to have many metrics, simultaneously, to count the time inside the same execution context. To do that, the same instance can receive multiples calls.  
+  
 ```python
 async def printit(**kwargs):
     print(kwargs)
