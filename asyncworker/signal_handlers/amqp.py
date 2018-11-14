@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class AMQP(SignalHandler):
     async def startup(self, app: 'App'):
-        for _handler, route_info in app.routes_registry.amqp_routes.items():
+        for route_info in app.routes_registry.amqp_routes:
             consumer = Consumer(route_info, app.host, app.user,
                                 app.password, app.prefetch_count)
             app.consumers.append(consumer)

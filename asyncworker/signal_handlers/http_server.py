@@ -14,7 +14,7 @@ class HTTPServer(SignalHandler):
 
     async def startup(self, app: 'BaseApp'):
         app.http_app = web.Application()
-        for func, route in app.routes_registry.http_routes.items():
+        for route in app.routes_registry.http_routes:
             app.http_app.router.add_route(**route)
 
         app.http_runner = web.AppRunner(app.http_app)

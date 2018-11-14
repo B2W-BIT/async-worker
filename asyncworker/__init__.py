@@ -20,21 +20,3 @@ class App(BaseApp):
         for _handler, route_info in self.routes_registry.amqp_routes.items():
             consumers.append(Consumer(route_info, self.host, self.user, self.password, self.prefetch_count))
         return consumers
-
-    def route(self, routes, vhost="/", options={}):
-        def wrap(f):
-            self.routes_registry[f] = {
-                "type": "amqp",
-                "route": routes,
-                "handler": f,
-                "options": {
-                    "vhost": vhost,
-                    "bulk_size": options.get(Options.BULK_SIZE, Defaultvalues.BULK_SIZE),
-                    "bulk_flush_interval": options.get(Options.BULK_FLUSH_INTERVAL, Defaultvalues.BULK_FLUSH_INTERVAL),
-                    Events.ON_SUCCESS: options.get(Events.ON_SUCCESS, Defaultvalues.ON_SUCCESS),
-                    Events.ON_EXCEPTION: options.get(Events.ON_EXCEPTION, Defaultvalues.ON_EXCEPTION),
-                }
-            }
-            return f
-        return wrap
-

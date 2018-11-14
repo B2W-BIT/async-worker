@@ -1,4 +1,6 @@
 import asyncio
+from typing import Iterable
+
 from aiohttp import Signal
 
 from asyncworker.conf import logger
@@ -43,14 +45,21 @@ class BaseApp:
         """
         await self._on_startup.send(self)
 
-    def http_route(self, method, path, **kwargs):
-        def wrap(f):
+    def route(self,
+              routes: Iterable[str],
+              type: str,
+              options: dict=None,
+              **kwargs):
+        if options is None:
+            options = {}
+
+        def wrapper(f):
             self.routes_registry[f] = {
-                'type': 'http',
-                'method': method,
-                'path': path,
+                'type': type,
+                'routes': routes,
                 'handler': f,
+                'options': options,
                 **kwargs
             }
             return f
-        return wrap
+        return wrapper
