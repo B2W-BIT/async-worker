@@ -23,13 +23,13 @@ have "health-checker" package installed)
 app = App(host="localhost", user="guest", password="guest", prefetch_count=1024)
 
 
-@app.http_route('GET', '/')
+@app.route(routes=['/', '/a'], type='http', methods=['GET'])
 async def index(request: web.Request) -> web.Response:
     return web.Response(body="Hello world")
 
 
 if HEALTHCHECKER_ENABLED:
-    @app.http_route('GET', '/healthcheck')
+    @app.route(routes=['/healthcheck'], type='http', methods=['GET'])
     class HealthCheck(AsyncCheckCase, web.View):
         @property
         def loop(self) -> asyncio.AbstractEventLoop:
@@ -55,7 +55,7 @@ if HEALTHCHECKER_ENABLED:
             return False
 
 
-@app.route(["words_to_index"], vhost="/", options={Options.BULK_SIZE: 1})
+@app.route(routes=["words_to_index"], type='amqp', vhost="/", options={Options.BULK_SIZE: 1})
 async def drain_handler(messages: List[RabbitMQMessage]):
     print(messages)
 
