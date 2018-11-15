@@ -21,7 +21,7 @@ class Consumer(AsyncQueueConsumerDelegate):
                  bucket_class: Type[Bucket]=Bucket) -> None:
         self.route = route_info
         self._handler = route_info['handler']
-        self._queue_name = route_info['route']
+        self._queue_name = route_info['routes']
         self._route_options = route_info['options']
         self.host = host
         self.vhost = self._route_options.get("vhost", "/")

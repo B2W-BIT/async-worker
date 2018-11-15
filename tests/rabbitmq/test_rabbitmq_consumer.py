@@ -26,7 +26,7 @@ class ConsumerTest(asynctest.TestCase):
         self.queue_mock = CoroutineMock(ack=CoroutineMock(), reject=CoroutineMock())
         self.connection_parameters = ("127.0.0.1", "guest", "guest", 1024)
         self.one_route_fixture = {
-            "route": ["/asgard/counts/ok"],
+            "routes": ["/asgard/counts/ok"],
             "handler": _handler,
             "options": {
                 "vhost": "/",
@@ -119,34 +119,46 @@ class ConsumerTest(asynctest.TestCase):
         @self.app.route(["queue"], options = {Events.ON_EXCEPTION: Actions.REQUEUE})
         async def _handler(messages):
             raise Exception("BOOM!")
-        consumer = Consumer(self.app.routes_registry[_handler], *self.connection_parameters)
+
+        route = self.app.routes_registry.amqp_routes[0]
+        consumer = Consumer(route, *self.connection_parameters)
+
         with self.assertRaises(Exception):
             await consumer.on_queue_message({"key": 42}, delivery_tag=10, queue=self.queue_mock)
         self.queue_mock.reject.assert_awaited_with(delivery_tag=10, requeue=True)
 
     async def test_on_exception_reject_message(self):
-        @self.app.route(["queue"], options = {Events.ON_EXCEPTION: Actions.REJECT})
+        @self.app.route(["queue"], options={Events.ON_EXCEPTION: Actions.REJECT})
         async def _handler(messages):
             raise Exception("BOOM!")
-        consumer = Consumer(self.app.routes_registry[_handler], *self.connection_parameters)
+
+        route = self.app.routes_registry.amqp_routes[0]
+        consumer = Consumer(route, *self.connection_parameters)
+
         with self.assertRaises(Exception):
             await consumer.on_queue_message({"key": 42}, delivery_tag=10, queue=self.queue_mock)
         self.queue_mock.reject.assert_awaited_with(delivery_tag=10, requeue=False)
 
     async def test_on_exception_ack_message(self):
-        @self.app.route(["queue"], options = {Events.ON_EXCEPTION: Actions.ACK})
+        @self.app.route(["queue"], options={Events.ON_EXCEPTION: Actions.ACK})
         async def _handler(messages):
             raise Exception("BOOM!")
-        consumer = Consumer(self.app.routes_registry[_handler], *self.connection_parameters)
+
+        route = self.app.routes_registry.amqp_routes[0]
+        consumer = Consumer(route, *self.connection_parameters)
         with self.assertRaises(Exception):
             await consumer.on_queue_message({"key": 42}, delivery_tag=10, queue=self.queue_mock)
+
         self.queue_mock.ack.assert_awaited_with(delivery_tag=10)
 
     async def test_on_success_ack(self):
         @self.app.route(["queue"], options = {Events.ON_SUCCESS: Actions.ACK})
         async def _handler(messages):
             return 42
-        consumer = Consumer(self.app.routes_registry[_handler], *self.connection_parameters)
+
+        route = self.app.routes_registry.amqp_routes[0]
+        consumer = Consumer(route, *self.connection_parameters)
+
         await consumer.on_queue_message({"key": 42}, delivery_tag=10, queue=self.queue_mock)
         self.queue_mock.ack.assert_awaited_with(delivery_tag=10)
 
@@ -154,7 +166,10 @@ class ConsumerTest(asynctest.TestCase):
         @self.app.route(["queue"], options = {Events.ON_SUCCESS: Actions.REJECT})
         async def _handler(messages):
             return 42
-        consumer = Consumer(self.app.routes_registry[_handler], *self.connection_parameters)
+
+        route = self.app.routes_registry.amqp_routes[0]
+        consumer = Consumer(route, *self.connection_parameters)
+
         await consumer.on_queue_message({"key": 42}, delivery_tag=10, queue=self.queue_mock)
         self.queue_mock.reject.assert_awaited_with(delivery_tag=10, requeue=False)
 
@@ -162,7 +177,10 @@ class ConsumerTest(asynctest.TestCase):
         @self.app.route(["queue"], options = {Events.ON_SUCCESS: Actions.REQUEUE})
         async def _handler(messages):
             return 42
-        consumer = Consumer(self.app.routes_registry[_handler], *self.connection_parameters)
+
+        route = self.app.routes_registry.amqp_routes[0]
+        consumer = Consumer(route, *self.connection_parameters)
+
         await consumer.on_queue_message({"key": 42}, delivery_tag=10, queue=self.queue_mock)
         self.queue_mock.reject.assert_awaited_with(delivery_tag=10, requeue=True)
 
@@ -385,12 +403,12 @@ class ConsumerTest(asynctest.TestCase):
         consumer.quene_name deve retornar o nome da fila que está sendo consumida.
         """
         consumer = Consumer(self.one_route_fixture, *self.connection_parameters)
-        self.assertEquals(self.one_route_fixture['route'], consumer.queue_name)
+        self.assertEquals(self.one_route_fixture['routes'], consumer.queue_name)
 
     async def test_consume_all_queues(self):
         """
         """
-        self.one_route_fixture['route'] = ["asgard/counts", "asgard/counts/errors"]
+        self.one_route_fixture['routes'] = ["asgard/counts", "asgard/counts/errors"]
         consumer = Consumer(self.one_route_fixture, *self.connection_parameters)
         queue_mock = CoroutineMock(consume=CoroutineMock())
         await consumer.consume_all_queues(queue_mock)
@@ -398,11 +416,12 @@ class ConsumerTest(asynctest.TestCase):
         self.assertEqual([mock.call(queue_name="asgard/counts"), mock.call(queue_name="asgard/counts/errors")], queue_mock.consume.await_args_list)
 
     def test_start_calls_connect_and_consume_for_each_queue(self):
-        self.one_route_fixture['route'] = ["asgard/counts", "asgard/counts/errors"]
+        self.one_route_fixture['routes'] = ["asgard/counts", "asgard/counts/errors"]
         consumer = Consumer(self.one_route_fixture, *self.connection_parameters)
         queue_mock = CoroutineMock(consume=CoroutineMock(), connect=CoroutineMock(), is_connected=False)
         loop = asyncio.get_event_loop()
         consumer.queue = queue_mock
+
         with asynctest.patch.object(consumer, 'keep_runnig', side_effect=[True, False]) as keep_running_mock:
             loop.run_until_complete(consumer.start())
 
@@ -411,7 +430,7 @@ class ConsumerTest(asynctest.TestCase):
         self.assertEqual([mock.call(queue_name="asgard/counts"), mock.call(queue_name="asgard/counts/errors")], queue_mock.consume.await_args_list)
 
     def test_start_reconnects_if_connectaion_failed(self):
-        self.one_route_fixture['route'] = ["asgard/counts", "asgard/counts/errors"]
+        self.one_route_fixture['routes'] = ["asgard/counts", "asgard/counts/errors"]
         consumer = Consumer(self.one_route_fixture, *self.connection_parameters)
         with unittest.mock.patch.object(consumer, 'keep_runnig', side_effect=[True, True, False]), \
                 asynctest.patch.object(asyncio, 'sleep') as sleep_mock:
