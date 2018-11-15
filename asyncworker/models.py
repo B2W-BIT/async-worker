@@ -1,23 +1,33 @@
 from collections import UserDict
-from typing import Callable, Coroutine, Dict, List
+from enum import Enum, auto
+from typing import Callable, Coroutine, Dict, List, Any
 
 from cached_property import cached_property
 
+from asyncworker.conf import settings
 from asyncworker.options import Defaultvalues, Events, Options
 
-Route = Callable[[], Coroutine]
+
+RouteHandler = Callable[[], Coroutine]
+Route = Dict[str, Any]
 
 
-class Routes(UserDict):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._cache = {}
+class _AutoName(Enum):
+    def _generate_next_value_(name: str, start, count, last_values):
+        return name
 
+
+class RouteTypes(str, Enum):
+    AMQP = auto()
+    HTTP = auto()
+
+
+class RoutesRegistry(UserDict):
     @cached_property
     def http_routes(self) -> List[Dict]:
         routes = []
         for handler, route in self.items():
-            if route['type'] != 'http':
+            if route['type'] is not RouteTypes.HTTP:
                 continue
             for path in route['routes']:
                 for method in route['methods']:
@@ -32,24 +42,26 @@ class Routes(UserDict):
     def amqp_routes(self) -> List[Dict]:
         routes = []
         for handler, route in self.items():
-            if route['type'] == 'amqp':
-                options = route['options']
-                routes.append({
-                    "routes": route['routes'],
-                    "handler": handler,
-                    "options": {
-                        "vhost": route['vhost'],
-                        "bulk_size": options.get(Options.BULK_SIZE,
-                                                 Defaultvalues.BULK_SIZE),
-                        "bulk_flush_interval": options.get(
-                            Options.BULK_FLUSH_INTERVAL,
-                            Defaultvalues.BULK_FLUSH_INTERVAL),
-                        Events.ON_SUCCESS: options.get(
-                            Events.ON_SUCCESS,
-                            Defaultvalues.ON_SUCCESS),
-                        Events.ON_EXCEPTION: options.get(
-                            Events.ON_EXCEPTION,
-                            Defaultvalues.ON_EXCEPTION),
-                    }
-                })
+            if route['type'] is not RouteTypes.AMQP:
+                continue
+            options = route['options']
+            routes.append({
+                "routes": route['routes'],
+                "handler": handler,
+                "options": {
+                    "vhost": route.get('vhost',
+                                       settings.AMQP_DEFAULT_VHOST),
+                    "bulk_size": options.get(Options.BULK_SIZE,
+                                             Defaultvalues.BULK_SIZE),
+                    "bulk_flush_interval": options.get(
+                        Options.BULK_FLUSH_INTERVAL,
+                        Defaultvalues.BULK_FLUSH_INTERVAL),
+                    Events.ON_SUCCESS: options.get(
+                        Events.ON_SUCCESS,
+                        Defaultvalues.ON_SUCCESS),
+                    Events.ON_EXCEPTION: options.get(
+                        Events.ON_EXCEPTION,
+                        Defaultvalues.ON_EXCEPTION),
+                }
+            })
         return routes

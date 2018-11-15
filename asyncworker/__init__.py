@@ -17,6 +17,6 @@ class App(BaseApp):
 
     def _build_consumers(self):
         consumers = []
-        for _handler, route_info in self.routes_registry.amqp_routes.items():
+        for route_info in self.routes_registry.amqp_routes:
             consumers.append(Consumer(route_info, self.host, self.user, self.password, self.prefetch_count))
         return consumers
