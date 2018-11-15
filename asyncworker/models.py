@@ -13,7 +13,7 @@ Route = Dict[str, Any]
 
 
 class _AutoName(Enum):
-    def _generate_next_value_(name: str, start, count, last_values):
+    def _generate_next_value_(name, start, count, last_values):  # type: ignore
         return name
 
 
@@ -24,7 +24,7 @@ class RouteTypes(str, Enum):
 
 class RoutesRegistry(UserDict):
     @cached_property
-    def http_routes(self) -> List[Dict]:
+    def http_routes(self) -> List[Route]:
         routes = []
         for handler, route in self.items():
             if route['type'] is not RouteTypes.HTTP:
