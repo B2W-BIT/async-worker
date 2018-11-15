@@ -5,7 +5,7 @@ from aiohttp import Signal
 
 from asyncworker.conf import logger
 from asyncworker.signal_handlers.http_server import HTTPServer
-from asyncworker.models import Routes
+from asyncworker.models import RoutesRegistry, RouteTypes
 from asyncworker.utils import entrypoint
 
 
@@ -14,7 +14,7 @@ class BaseApp:
 
     def __init__(self) -> None:
         self.loop = asyncio.get_event_loop()
-        self.routes_registry = Routes()
+        self.routes_registry = RoutesRegistry()
         self.consumers = []
 
         self._on_startup = Signal(self)
@@ -47,15 +47,19 @@ class BaseApp:
 
     def route(self,
               routes: Iterable[str],
-              type: str,
+              type: str=RouteTypes.AMQP,
               options: dict=None,
               **kwargs):
         if options is None:
             options = {}
+        if isinstance(type, RouteTypes):
+            route_type = type
+        else:
+            route_type = RouteTypes[type.upper()]
 
         def wrapper(f):
             self.routes_registry[f] = {
-                'type': type,
+                'type': route_type,
                 'routes': routes,
                 'handler': f,
                 'options': options,
