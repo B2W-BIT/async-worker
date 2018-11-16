@@ -403,7 +403,7 @@ class ConsumerTest(asynctest.TestCase):
         consumer.quene_name deve retornar o nome da fila que está sendo consumida.
         """
         consumer = Consumer(self.one_route_fixture, *self.connection_parameters)
-        self.assertEquals(self.one_route_fixture['routes'], consumer.queue_name)
+        self.assertEqual(self.one_route_fixture['routes'], consumer.queue_name)
 
     async def test_consume_all_queues(self):
         """
