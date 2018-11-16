@@ -8,6 +8,7 @@ from aioresponses import aioresponses
 
 from asyncworker.sse.consumer import SSEConsumer
 from asyncworker.bucket import Bucket
+from tests.utils import get_fixture
 
 
 async def _handler(message):
@@ -80,7 +81,7 @@ class SSEConsumerTest(TestCase):
             data: ...
         Chamamos o método `on_event()`
         """
-        content = open("./tests/fixtures/sse/single-event.txt").read()
+        content = get_fixture("sse/single-event.txt")
 
         with asynctest.patch.object(self.consumer, 'keep_runnig', side_effect=[True, False]), \
                 asynctest.patch.object(self.consumer, "on_event") as on_event_mock:
@@ -92,7 +93,7 @@ class SSEConsumerTest(TestCase):
                                                       b'{"remoteAddress":"172.18.0.1","eventType":"event_stream_attached","timestamp":"2018-09-03T18:03:45.685Z"}')], args_list)
 
     async def test_call_on_event_ignore_blank_lines(self):
-        content = open("./tests/fixtures/sse/multi-event-blanklines-in-between.txt").read()
+        content = get_fixture("sse/multi-event-blanklines-in-between.txt")
 
         with asynctest.patch.object(self.consumer, 'keep_runnig', side_effect=[True, False]), \
                 asynctest.patch.object(self.consumer, "on_event") as on_event_mock:
@@ -169,7 +170,7 @@ class SSEConsumerTest(TestCase):
         Call on_exceptin when an unhandled exception is raised
         """
 
-        content = open("./tests/fixtures/sse/single-event.txt").read()
+        content = get_fixture("sse/single-event.txt")
 
         with asynctest.patch.object(self.consumer, 'keep_runnig', side_effect=self.total_loops(1)), \
                 asynctest.patch.object(self.consumer, "on_event", side_effect=Exception()), \
