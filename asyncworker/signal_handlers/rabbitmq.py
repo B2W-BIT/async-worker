@@ -7,7 +7,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from asyncworker import App
 
 
-class AMQP(SignalHandler):
+class RabbitMQ(SignalHandler):
     async def startup(self, app: 'App'):
         for route_info in app.routes_registry.amqp_routes:
             consumer = Consumer(route_info, app.host, app.user,
