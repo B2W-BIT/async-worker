@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from asyncworker.consumer import Consumer
 from asyncworker.signal_handlers.base import SignalHandler
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from asyncworker import App
 
 
