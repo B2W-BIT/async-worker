@@ -17,7 +17,7 @@ class _AutoName(Enum):
         return name
 
 
-class RouteTypes(str, Enum):
+class RouteTypes(str, _AutoName):
     AMQP = auto()
     HTTP = auto()
 

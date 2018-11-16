@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     HTTP_PORT: int = 8080
     HTTP_HEALTHCHECK_ENABLED: bool = True
 
+    AMQP_DEFAULT_VHOST: str = '/'
+
     class Config:
         allow_mutation = False
         env_prefix = "ASYNCWORKER_"
