@@ -13,16 +13,16 @@ class HTTPServer(SignalHandler):
     is_enabled = settings.HTTP_ENABLED
 
     async def startup(self, app: 'BaseApp'):
-        app.http_app = web.Application()
+        app['http_app'] = web.Application()
         for route in app.routes_registry.http_routes:
-            app.http_app.router.add_route(**route)
+            app['http_app'].router.add_route(**route)
 
-        app.http_runner = web.AppRunner(app.http_app)
-        await app.http_runner.setup()
-        site = web.TCPSite(runner=app.http_runner,
-                           host=settings.HTTP_HOST,
-                           port=settings.HTTP_PORT)
-        await site.start()
+        app['http_runner'] = web.AppRunner(app['http_app'])
+        await app['http_runner'].setup()
+        app['http_site'] = web.TCPSite(runner=app['http_runner'],
+                                       host=settings.HTTP_HOST,
+                                       port=settings.HTTP_PORT)
+        await app['http_site'].start()
 
     async def shutdown(self, app: 'BaseApp'):
-        await app.http_runner.cleanup()
+        await app['http_runner'].cleanup()
