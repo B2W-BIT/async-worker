@@ -27,7 +27,7 @@ class AMQPTests(asynctest.TestCase):
             }
         )
 
-    @asynctest.patch("asyncworker.signal_handlers.amqp.Consumer.start")
+    @asynctest.patch("asyncworker.signal_handlers.rabbitmq.Consumer.start")
     async def test_startup_initializes_and_starts_one_consumer_per_route(self,
                                                                          start):
         app = Mock(
