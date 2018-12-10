@@ -62,7 +62,9 @@ class AMQPTests(asynctest.TestCase):
             any_order=True,
         )
         Consumer.return_value.start.assert_has_calls([call(), call()])
-        app[RouteTypes.AMQP_RABBITMQ].__getitem__.return_value.append.assert_has_calls(
+        app[
+            RouteTypes.AMQP_RABBITMQ
+        ].__getitem__.return_value.append.assert_has_calls(
             [call(Consumer.return_value), call(Consumer.return_value)]
         )
 
@@ -81,7 +83,9 @@ class AMQPTests(asynctest.TestCase):
         app.routes_registry = self.routes_registry
         await self.signal_handler.startup(app)
 
-        self.assertIsInstance(app[RouteTypes.AMQP_RABBITMQ]["connection"], AMQPConnection)
+        self.assertIsInstance(
+            app[RouteTypes.AMQP_RABBITMQ]["connection"], AMQPConnection
+        )
         register.assert_has_calls(
             [call(consumer.queue) for consumer in app["consumers"]]
         )

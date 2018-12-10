@@ -11,7 +11,7 @@ if TYPE_CHECKING:  # pragma: no cover
 
 class RabbitMQ(SignalHandler):
     async def startup(self, app: "App"):
-        app[RouteTypes.AMQP_RABBITMQ]['connection'] = AMQPConnection(
+        app[RouteTypes.AMQP_RABBITMQ]["connection"] = AMQPConnection(
             hostname=app.host, username=app.user, password=app.password
         )
         app[RouteTypes.AMQP_RABBITMQ]["consumers"] = []
@@ -20,5 +20,5 @@ class RabbitMQ(SignalHandler):
                 route_info, app.host, app.user, app.password, app.prefetch_count
             )
             app[RouteTypes.AMQP_RABBITMQ]["consumers"].append(consumer)
-            app[RouteTypes.AMQP_RABBITMQ]['connection'].register(consumer.queue)
+            app[RouteTypes.AMQP_RABBITMQ]["connection"].register(consumer.queue)
             app.loop.create_task(consumer.start())
