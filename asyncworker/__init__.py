@@ -13,7 +13,9 @@ from asyncworker.signals.handlers.rabbitmq import RabbitMQ
 class App(BaseApp):
     handlers = (RabbitMQ(), HTTPServer())
 
-    def __init__(self, host, user, password, prefetch_count):
+    def __init__(
+        self, host: str, user: str, password: str, prefetch_count: int = None
+    ) -> None:
         super(App, self).__init__()
         self.host = host
         self.user = user
