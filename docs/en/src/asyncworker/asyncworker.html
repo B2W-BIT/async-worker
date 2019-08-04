@@ -510,7 +510,7 @@ is ready to be handled.</p>
 
 <dl class="method">
 <dt id="asyncworker.routes.RoutesRegistry.route_for">
-<code class="sig-name descname">route_for</code><span class="sig-paren">(</span><em class="sig-param">handler: Callable[Coroutine]</em><span class="sig-paren">)</span> &#x2192; asyncworker.routes.Route<a class="reference internal" href="../../_modules/asyncworker/routes.html#RoutesRegistry.route_for"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.routes.RoutesRegistry.route_for" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">route_for</code><span class="sig-paren">(</span><em class="sig-param">handler: Callable[..., Coroutine]</em><span class="sig-paren">)</span> &#x2192; asyncworker.routes.Route<a class="reference internal" href="../../_modules/asyncworker/routes.html#RoutesRegistry.route_for"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.routes.RoutesRegistry.route_for" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -530,6 +530,16 @@ is ready to be handled.</p>
 <dd></dd></dl>
 
 </dd></dl>
+
+<dl class="function">
+<dt id="asyncworker.routes.call_http_handler">
+<em class="property">async </em><code class="sig-prename descclassname">asyncworker.routes.</code><code class="sig-name descname">call_http_handler</code><span class="sig-paren">(</span><em class="sig-param">request: aiohttp.web_request.Request, handler: Callable[..., Coroutine]</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asyncworker/routes.html#call_http_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.routes.call_http_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="asyncworker.routes.http_handler_wrapper">
+<code class="sig-prename descclassname">asyncworker.routes.</code><code class="sig-name descname">http_handler_wrapper</code><span class="sig-paren">(</span><em class="sig-param">handler</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asyncworker/routes.html#http_handler_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.routes.http_handler_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </div>
 <div class="section" id="module-asyncworker.task_runners">

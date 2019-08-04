@@ -1,0 +1,155 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>asyncworker.types package &#8212; Asyncworker  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="asyncworker-types-package">
+<h1>asyncworker.types package<a class="headerlink" href="#asyncworker-types-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-asyncworker.types.registry">
+<span id="asyncworker-types-registry-module"></span><h2>asyncworker.types.registry module<a class="headerlink" href="#module-asyncworker.types.registry" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="asyncworker.types.registry.TypesRegistry">
+<em class="property">class </em><code class="sig-prename descclassname">asyncworker.types.registry.</code><code class="sig-name descname">TypesRegistry</code><a class="reference internal" href="../../_modules/asyncworker/types/registry.html#TypesRegistry"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.types.registry.TypesRegistry" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="asyncworker.types.registry.TypesRegistry.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param">_type: Type</em><span class="sig-paren">)</span> &#x2192; Any<a class="reference internal" href="../../_modules/asyncworker/types/registry.html#TypesRegistry.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.types.registry.TypesRegistry.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asyncworker.types.registry.TypesRegistry.set">
+<code class="sig-name descname">set</code><span class="sig-paren">(</span><em class="sig-param">obj</em>, <em class="sig-param">type_definition=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asyncworker/types/registry.html#TypesRegistry.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.types.registry.TypesRegistry.set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-asyncworker.types.resolver">
+<span id="asyncworker-types-resolver-module"></span><h2>asyncworker.types.resolver module<a class="headerlink" href="#module-asyncworker.types.resolver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="asyncworker.types.resolver.ArgResolver">
+<em class="property">class </em><code class="sig-prename descclassname">asyncworker.types.resolver.</code><code class="sig-name descname">ArgResolver</code><span class="sig-paren">(</span><em class="sig-param">registry: asyncworker.types.registry.TypesRegistry</em>, <em class="sig-param">*extra_registries</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asyncworker/types/resolver.html#ArgResolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.types.resolver.ArgResolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="asyncworker.types.resolver.ArgResolver.resolve_param">
+<code class="sig-name descname">resolve_param</code><span class="sig-paren">(</span><em class="sig-param">param_type: Type</em><span class="sig-paren">)</span> &#x2192; Optional[Any]<a class="reference internal" href="../../_modules/asyncworker/types/resolver.html#ArgResolver.resolve_param"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.types.resolver.ArgResolver.resolve_param" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="asyncworker.types.resolver.ArgResolver.wrap">
+<code class="sig-name descname">wrap</code><span class="sig-paren">(</span><em class="sig-param">coro_ref</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/asyncworker/types/resolver.html#ArgResolver.wrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.types.resolver.ArgResolver.wrap" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="asyncworker.types.resolver.MissingTypeAnnotationError">
+<em class="property">exception </em><code class="sig-prename descclassname">asyncworker.types.resolver.</code><code class="sig-name descname">MissingTypeAnnotationError</code><a class="reference internal" href="../../_modules/asyncworker/types/resolver.html#MissingTypeAnnotationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#asyncworker.types.resolver.MissingTypeAnnotationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-asyncworker.types">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-asyncworker.types" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Asyncworker</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../intro.html">Introdução</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../userguide/index.html">Guia de uso</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog/index.html">Changelog</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, B2W Digital.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../../_sources/src/asyncworker/asyncworker.types.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
