@@ -1,7 +1,17 @@
 import inspect
 import typing
 from asyncio import Task
-from typing import List, Type, Coroutine, Dict, Any, Union, Callable
+from typing import (
+    List,
+    Type,
+    Coroutine,
+    Dict,
+    Any,
+    Union,
+    Callable,
+    Iterable,
+    Tuple,
+)
 
 from asyncworker.types.registry import TypesRegistry
 
@@ -11,7 +21,9 @@ class MissingTypeAnnotationError(Exception):
 
 
 class ArgResolver:
-    def __init__(self, registry: TypesRegistry, *extra_registries) -> None:
+    def __init__(
+        self, registry: TypesRegistry, *extra_registries: TypesRegistry
+    ) -> None:
         self.registries: List[TypesRegistry] = [registry]
         self.registries.extend(extra_registries)
 
