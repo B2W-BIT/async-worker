@@ -3,7 +3,7 @@ from typing import List
 from asynctest import TestCase
 
 from asyncworker.types.registry import TypesRegistry
-from asyncworker.types.resolver import ArgResolver
+from asyncworker.types.resolver import ArgResolver, MissingTypeAnnotationError
 
 
 class ArgResolverTest(TestCase):
@@ -72,6 +72,43 @@ class ArgResolverTest(TestCase):
         result = await resolver.wrap(coro)
         self.assertEqual((42, "string", True), result)
 
+    async def test_reolves_args_that_is_falsy(self):
+        """
+        Mesmo o objeto sendo bool(arg) == False temos que conseguir
+        resolvê-lo
+        """
+
+        class MyObject:
+            def __bool__(self):
+                return False
+
+        async def my_coro(obj: MyObject):
+            return obj
+
+        instance = MyObject()
+        registry = TypesRegistry()
+        registry.set(instance)
+
+        resolver = ArgResolver(registry)
+        result = await resolver.wrap(my_coro)
+        self.assertEqual(instance, result)
+
+    async def test_resolve_multiple_coros_with_same_registry(self):
+        async def coro(p: int):
+            return p
+
+        registry_one = TypesRegistry()
+        registry_one.set(42)
+
+        resolver = ArgResolver(registry_one)
+        result = await resolver.wrap(coro)
+        self.assertEqual(42, await resolver.wrap(coro))
+
+        resolver2 = ArgResolver(registry_one)
+        self.assertEqual(42, await resolver2.wrap(coro))
+
+        self.assertEqual(42, registry_one.get(int))
+
     async def test_resolve_list_argument(self):
         async def my_coro(arg0: List[int], value: str):
             return arg0, value
@@ -82,3 +119,15 @@ class ArgResolverTest(TestCase):
 
         resolver = ArgResolver(registry)
         self.assertEqual(([42, 42], "value"), await resolver.wrap(my_coro))
+
+    async def test_raise_argument_error_if_coro_has_no_type_annotation(self):
+        async def my_coro(arg0):
+            return arg0
+
+        registry = TypesRegistry()
+        registry.set([42, 42])
+        registry.set("value")
+
+        resolver = ArgResolver(registry)
+        with self.assertRaises(MissingTypeAnnotationError):
+            await resolver.wrap(my_coro)

@@ -1,8 +1,13 @@
+import inspect
+import typing
 from asyncio import Task
-from functools import wraps
 from typing import List, Type, Coroutine, Dict, Any, Union
 
 from asyncworker.types.registry import TypesRegistry
+
+
+class MissingTypeAnnotationError(Exception):
+    pass
 
 
 class ArgResolver:
@@ -18,7 +23,7 @@ class ArgResolver:
     def resolve_param(self, param_type: Type) -> Union[Any, None]:
         for registry in self.registries:
             arg_value = registry.get(param_type)
-            if arg_value:
+            if arg_value is not None:
                 return arg_value
 
         return None
@@ -26,14 +31,23 @@ class ArgResolver:
     async def _coro_executor(self, coro_ref: Type[Coroutine]):
         params: Dict[str, Any] = {}
         unresolved_params = []
-        for param_name, param_type in coro_ref.__annotations__.items():
-            param_value = self.resolve_param(param_type)
-            if param_value:
-                params[param_name] = param_value
-            else:
-                unresolved_params.append((param_name, param_type))
-        if unresolved_params:
-            raise TypeError(
-                f"Unresolved params for coroutine {coro_ref}: {unresolved_params}"
-            )
+        coro_arguments = inspect.signature(coro_ref).parameters
+        type_annotations = typing.get_type_hints(coro_ref)
+
+        if coro_arguments:
+            if not type_annotations:
+                raise MissingTypeAnnotationError(
+                    f"{coro_ref} has no type annotation"
+                )
+
+            for param_name, param_type in type_annotations.items():
+                param_value = self.resolve_param(param_type)
+                if param_value is not None:
+                    params[param_name] = param_value
+                else:
+                    unresolved_params.append((param_name, param_type))
+            if unresolved_params:
+                raise TypeError(
+                    f"Unresolved params for coroutine {coro_ref}: {unresolved_params}"
+                )
         return await coro_ref(**params)
