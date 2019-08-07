@@ -1,13 +1,12 @@
 import asyncio
 import os
-from functools import wraps
 from random import randint
 
+import asynctest
 from aiohttp import web
 from aiohttp.test_utils import TestClient, TestServer
-
-import asynctest
 from asynctest import mock, CoroutineMock, Mock, patch
+
 from asyncworker import App
 from asyncworker.conf import settings, Settings
 from asyncworker.routes import RouteTypes, RoutesRegistry, call_http_handler
@@ -266,7 +265,6 @@ class HTTPServerTests(asynctest.TestCase):
 
     async def test_resolves_handler_parameters_when_receiving_request(self):
         def my_decorator(handler):
-            @wraps(handler)
             async def _wrapper(request: web.Request):
                 return await call_http_handler(request, handler)
 
