@@ -1,0 +1,16 @@
+0.11.0
+================
+
+
+Tag: `0.11.0 <https://github.com/B2W-BIT/async-worker/releases/tag/0.11.0>`_
+
+2019-10-15
+
+
+ * `PR 129 <https://github.com/B2W-BIT/async-worker/pull/129>`_ Generic App with multiple connections
+
+* Mudando dependencia do pydantic para ser >= 0.14 em vez de ==0.14
+* Mudando a descrição no setup.py para ser mais coerente com o projeto
+* Os testes de integração não estavam sendo rodados no CI.
+
+Raw Commits: `0.11.0 <https://github.com/B2W-BIT/async-worker/compare/0.10.1...0.11.0>`_
