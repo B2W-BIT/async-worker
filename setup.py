@@ -23,7 +23,7 @@ setup(
     install_requires=[
         "aioamqp==0.12.0",
         "aiologger>=0.4.0-rc1",
-        "pydantic==0.28",
+        "pydantic==0.30",
         "cached-property==1.5.1",
         "aiohttp==3.4.4",
     ],
