@@ -1,0 +1,46 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2019, B2W Digital
+# This file is distributed under the same license as the Asyncworker
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2019.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Asyncworker \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-12-16 18:29-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.7.0\n"
+
+#: ../../changelog/v0.11.1.rst:2
+msgid "0.11.1"
+msgstr ""
+
+#: ../../changelog/v0.11.1.rst:5
+msgid ""
+"Tag: `0.11.1 <https://github.com/B2W-BIT/async-"
+"worker/releases/tag/0.11.1>`_"
+msgstr ""
+
+#: ../../changelog/v0.11.1.rst:7
+msgid "2019-10-15"
+msgstr ""
+
+#: ../../changelog/v0.11.1.rst:10
+msgid ""
+"`PR 135 <https://github.com/B2W-BIT/async-worker/pull/135>`_ Versão "
+"Pydantic atualizada para 0.30 em setup.py"
+msgstr ""
+
+#: ../../changelog/v0.11.1.rst:13
+msgid ""
+"Raw Commits: `0.11.0 <https://github.com/B2W-BIT/async-"
+"worker/compare/0.11.0...0.11.1>`_"
+msgstr ""
+

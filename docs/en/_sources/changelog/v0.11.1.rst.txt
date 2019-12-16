@@ -1,0 +1,13 @@
+0.11.1
+================
+
+
+Tag: `0.11.1 <https://github.com/B2W-BIT/async-worker/releases/tag/0.11.1>`_
+
+2019-10-15
+
+
+ * `PR 135 <https://github.com/B2W-BIT/async-worker/pull/135>`_ Versão Pydantic atualizada para 0.30 em setup.py
+
+
+Raw Commits: `0.11.0 <https://github.com/B2W-BIT/async-worker/compare/0.11.0...0.11.1>`_
