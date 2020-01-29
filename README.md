@@ -1,7 +1,7 @@
 
-[![Build Status](https://travis-ci.org/B2W-BIT/async-worker.svg?branch=master)](https://travis-ci.org/B2W-BIT/async-worker)
-[![codecov](https://codecov.io/gh/B2W-BIT/async-worker/branch/master/graph/badge.svg?flag=unittest)](https://codecov.io/gh/B2W-BIT/async-worker)
-[![codecov](https://codecov.io/gh/B2W-BIT/async-worker/branch/master/graph/badge.svg?flag=typehint)](https://codecov.io/gh/B2W-BIT/async-worker)
+[![Build Status](https://travis-ci.org/b2wdigital/async-worker.svg?branch=master)](https://travis-ci.org/b2wdigital/async-worker)
+[![codecov](https://codecov.io/gh/b2wdigital/async-worker/branch/master/graph/badge.svg?flag=unittest)](https://codecov.io/gh/b2wdigital/async-worker)
+[![codecov](https://codecov.io/gh/b2wdigital/async-worker/branch/master/graph/badge.svg?flag=typehint)](https://codecov.io/gh/b2wdigital/async-worker)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 [![PyPI version](https://badge.fury.io/py/async-worker.svg)](https://badge.fury.io/py/async-worker)
 
@@ -19,11 +19,11 @@ Atualmente o projeto suporta as seguintes backends:
 
 # Incompatibilidades
 
-Atualmente, pelo fato o asyncworker usar o [aiologger](https://github.com/B2W-BIT/aiologger), ele é incompatível com apps que usam **múltiplos** loops de evento. Ou seja, se sua app cria um novo loop e substitui o loop anterior isso causará um problema com os logs gerados pelo asyncworker (via aiologger).
+Atualmente, pelo fato o asyncworker usar o [aiologger](https://github.com/b2wdigital/aiologger), ele é incompatível com apps que usam **múltiplos** loops de evento. Ou seja, se sua app cria um novo loop e substitui o loop anterior isso causará um problema com os logs gerados pelo asyncworker (via aiologger).
 
 No geral, as aplicações assíncronas usam apenas um loop de evento durante todo o seu ciclo de vida. Isso significa que a não se que você esteja escrevendo um código com um comportamento muito específico (que dependa da renovação do loop de eventos) você não terá maiores problemas em usar o asyncworker.
 
-Essa incompatibilidade do aiologger está sendo tratada na issue [#35](https://github.com/B2W-BIT/aiologger/issues/35).
+Essa incompatibilidade do aiologger está sendo tratada na issue [#35](https://github.com/b2wdigital/aiologger/issues/35).
 
 ## Escrevendo testes
 
@@ -36,7 +36,7 @@ Por causa dessa incompatibilidade com múltiplos loops para escrever testes voc�
 ```python
 
 from asyncworker import App, RouteTypes
-from asyncworker.connections import AMQPConnection 
+from asyncworker.connections import AMQPConnection
 
 
 amqp_conn = AMQPConnection(host="127.0.0.1", user="guest", password="guest", prefetch_count=256)
@@ -253,7 +253,7 @@ e com o async-worker você também consegue utilizar esse protocolo nos seus han
 ```python
 from aiohttp import web
 from asyncworker import App, RouteTypes
-from asyncworker.connections import AMQPConnection 
+from asyncworker.connections import AMQPConnection
 
 
 amqp_conn = AMQPConnection(host="localhost", user="guest", password="guest", prefetch_count=1024)
