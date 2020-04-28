@@ -1,9 +1,12 @@
 import logging
+from typing import List
 
 from aiologger.loggers.json import JsonLogger
 from pydantic import BaseSettings
 
 from asyncworker.options import DefaultValues
+
+INFINITY = float("inf")
 
 
 class Settings(BaseSettings):
@@ -17,6 +20,18 @@ class Settings(BaseSettings):
     HTTP_PORT: int = 8080
 
     FLUSH_TIMEOUT: int = DefaultValues.BULK_FLUSH_INTERVAL
+
+    # metrics
+    METRICS_DEFAULT_HISTOGRAM_BUCKETS_IN_MS: List[float] = [
+        10,
+        50,
+        100,
+        200,
+        500,
+        1_000,
+        5_000,
+        INFINITY,
+    ]
 
     class Config:
         allow_mutation = False
