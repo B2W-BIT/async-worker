@@ -9,6 +9,7 @@ aiohttp = "==3.6.2"
 pydantic = ">=0.32.2,<2.0"
 cached-property = "==1.5.1"
 aiologger = "==0.5.0"
+prometheus_client = "==0.7.1"
 
 [dev-packages]
 aioresponses = "==0.6.0"
