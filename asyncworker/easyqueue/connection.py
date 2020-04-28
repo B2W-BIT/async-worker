@@ -5,6 +5,8 @@ import aioamqp
 from aioamqp import AmqpProtocol
 from aioamqp.channel import Channel
 
+from asyncworker import metrics
+
 OnErrorCallback = Union[
     None, Callable[[Exception], None], Callable[[Exception], Coroutine]
 ]
@@ -60,6 +62,7 @@ class AMQPConnection:
 
         await self._protocol.close()
         self._transport.close()  # type: ignore
+        metrics.active_connections.dec()
 
     async def _connect(self) -> None:
         async with self._connection_lock:
@@ -69,3 +72,4 @@ class AMQPConnection:
             conn = await aioamqp.connect(**self.connection_parameters)
             self._transport, self._protocol = conn
             self.channel = await self._protocol.channel()
+            metrics.active_connections.inc()

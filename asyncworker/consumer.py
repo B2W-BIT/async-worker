@@ -4,7 +4,7 @@ from typing import Dict, List, Type, Union
 
 from aioamqp.exceptions import AioamqpException
 
-from asyncworker import conf
+from asyncworker import conf, metrics
 from asyncworker.easyqueue.message import AMQPMessage
 from asyncworker.easyqueue.queue import JsonQueue, QueueConsumerDelegate
 from asyncworker.options import DefaultValues, Events, Options
@@ -52,6 +52,10 @@ class Consumer(QueueConsumerDelegate):
             )
         )
         self.clock_task = None
+        metrics.active_consumers.inc()
+
+    def __del__(self):
+        metrics.active_consumers.dec()
 
     @property
     def queue_name(self) -> str:
@@ -92,6 +96,7 @@ class Consumer(QueueConsumerDelegate):
             self.bucket.put(message)
 
         if self.bucket.is_full():
+            metrics.filled_buckets.inc()
             return await self._flush_bucket_if_needed()
 
     async def _flush_clocked(self):
@@ -119,10 +124,12 @@ class Consumer(QueueConsumerDelegate):
                         "handler": self._handler.__name__,
                     }
                 )
-                rv = await self._handler(all_messages)
+                with metrics.bucket_handle_duration.time():
+                    rv = await self._handler(all_messages)
                 await asyncio.gather(
                     *(m.process_success() for m in all_messages)
                 )
+                metrics.flushed_buckets.inc()
                 return rv
         except AioamqpException as aioamqpException:
             raise aioamqpException

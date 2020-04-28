@@ -1,3 +1,4 @@
+from asyncworker import metrics
 from asyncworker.easyqueue.message import AMQPMessage
 from asyncworker.options import Actions
 
@@ -43,6 +44,10 @@ class RabbitMQMessage:
             await self._amqp_message.reject(requeue=True)
         elif action == Actions.ACK:
             await self._amqp_message.ack()
+
+        metrics.processed_messages.labels(
+            queue_name=self._amqp_message.queue_name, action=action
+        ).inc()
 
     async def process_success(self):
         action = self._final_action or self._on_success_action
