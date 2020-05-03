@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import List
 
 from aiologger.loggers.json import JsonLogger
@@ -22,6 +23,7 @@ class Settings(BaseSettings):
     FLUSH_TIMEOUT: int = DefaultValues.BULK_FLUSH_INTERVAL
 
     # metrics
+    METRICS_ENDPOINT: str = "/metrics"
     METRICS_DEFAULT_HISTOGRAM_BUCKETS_IN_MS: List[float] = [
         10,
         50,
@@ -38,6 +40,7 @@ class Settings(BaseSettings):
         env_prefix = "ASYNCWORKER_"
 
 
+default_timer = time.perf_counter
 settings = Settings()
 
 loglevel = getattr(logging, settings.LOGLEVEL, logging.INFO)
