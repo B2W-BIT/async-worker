@@ -1,5 +1,5 @@
 from asyncworker.conf import settings
-from .types import Counter, Histogram, Gauge
+from asyncworker.metrics.types import Counter, Histogram, Gauge
 
 
 active_consumers = Gauge(
