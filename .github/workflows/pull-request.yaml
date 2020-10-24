@@ -1,6 +1,10 @@
 name: pull-request
 
-on: pull_request
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs-src/**'
+      - 'docs/**'
 
 
 jobs:
