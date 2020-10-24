@@ -1,0 +1,62 @@
+name: pull-request
+
+on: pull_request
+
+
+jobs:
+  tests:
+    name: unittests
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: [3.6, 3.7, 3.8, 3.9, 3.x]
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Install python ${{matrix.python}}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{matrix.python}}
+
+      - name: Install pip/pipenv
+        run: pip install -U pip==20.2.3 pipenv==2020.8.13
+
+      - name: Install asyncworker
+        run: pipenv install --system --deploy --ignore-pipfile --dev
+
+      - name: pipenv run test
+        run: pipenv run test
+
+      - name: Coverage upload
+        uses: paambaati/codeclimate-action@v2.7.4
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Install python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install pip/pipenv
+        run: pip install -U pip==20.2.3 pipenv==2020.8.13
+
+      - name: Install aiologer
+        run: pipenv install --system --deploy --ignore-pipfile --dev
+
+      - name: pipenv run lint
+        run: pipenv run lint
+
+      - name: pipenv run fmt-check
+        run: pipenv run fmt-check
+
+      - name: pipenv run isort-check
+        run: pipenv run isort-check

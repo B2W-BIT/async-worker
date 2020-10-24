@@ -33,7 +33,7 @@ sphinx-issues = "*"
 python_version = "3"
 
 [scripts]
-test = "py.test -s --cov=asyncworker --cov-report term-missing tests/"
+test = "py.test -s --cov=asyncworker --cov-report=term-missing --cov-report=xml tests/"
 itest = "py.test -s --cov=asyncworker --cov-report term-missing itests/"
 all-tests = "py.test -s --cov=asyncworker --cov-report=term-missing --cov-report=xml tests/ itests/"
 lint = "mypy asyncworker --ignore-missing-imports"
