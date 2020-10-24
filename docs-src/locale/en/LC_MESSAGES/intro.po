@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Asyncworker \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-09 09:15-0300\n"
+"POT-Creation-Date: 2020-10-24 18:31-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,6 +23,9 @@ msgid "Introdução"
 msgstr ""
 
 #: ../../intro.rst:4
-msgid "O projeto é para..."
+msgid "O projeto é para fazer workers."
 msgstr ""
+
+#~ msgid "O projeto é para..."
+#~ msgstr ""
 
