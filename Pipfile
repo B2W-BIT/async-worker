@@ -28,7 +28,7 @@ sphinx = "==2.1.2"
 sphinx-intl = "==2.0.0"
 twine = "==3.1.1"
 sphinx-issues = "*"
-cryptography = "==3.2" # Required by twine. Installed manually because of https://github.com/b2wdigital/async-worker/pull/241
+cryptography = "==3.3.2" # Required by twine. Installed manually because of https://github.com/b2wdigital/async-worker/pull/241
 
 [requires]
 python_version = "3"
